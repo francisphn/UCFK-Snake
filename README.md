@@ -11,15 +11,10 @@ Make sure your ENCE260 UC Fun Kit 4 has been plugged into the computer. From the
 
 ## How to play
 
-1. Start the game by pressing the navswitch. The player snake will appear of length 2, as well as a one-dot apple.
+1. The game starts with sliding words of "Welcome to Snake". It is here that the navswitch should be pressed to start the game. The player snake will appear of length 2, as well as a one-dot apple.
 
 2. Use the navswitch to navigate the snake's head through to the apple. Once it has consumed an apple it will grow by one unit of length.
 
-3. Game is over and you lose when the snake accidentally touches any part of itself or any of the edges of the screen. However, you will win if the snake is able to eat 10 apples. The game will conclude there.
+3. Game is over and you lose when the snake accidentally touches any part of itself or any of the edges of the screen. However, you will win if the snake is able to eat 10 apples. The game will conclude there, with sliding words of "You lost" or "You won". The original menu "Welcome to Snake" is then displayed and should you want to play the game again, press the navswitch to restart.
 
-## The game menu
-
-The game starts with sliding words of "Welcome to Snake". It is here that the navswitch should be pressed to start the game.
-
-The gane ends with sliding words of "You lost" or "You won". The original menu "Welcome to Snake" is then displayed and should you want to play the game again, press the navswitch to restart.
 
