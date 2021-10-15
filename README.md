@@ -18,3 +18,7 @@ Make sure your ENCE260 UC Fun Kit 4 has been plugged into the computer. From the
 3. Game is over and you lose when the snake accidentally touches any part of itself or any of the edges of the screen. However, you will win if the snake is able to eat 10 apples. The game will conclude there, with sliding words of "You lost" or "You won". The original menu "Welcome to Snake" is then displayed and should you want to play the game again, press the navswitch to restart.
 
 
+## Technical Description
+There are four main files with their associated header files of the same names:
+* snake.c and snake.h
+* messages.c and message.h
