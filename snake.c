@@ -29,10 +29,28 @@ void tiny_init(void)
     tinygl_text_dir_set (TINYGL_TEXT_DIR_ROTATE);
 }
 
-// 3. Setting game initial state ---------------------------------
-void game_init(void)
+void snake_init(void)
 {
-    continue;
+    system_init();
+    pacer_init(PACER_RATE);
+}
+
+
+
+// 3. Setting game initial state ---------------------------------
+void main(void)
+{
+    snake_init();
+    tinygl_text("Welcome to Snake\0");
+
+    while(1)
+    {
+        pacer_wait();
+        
+        /* TODO: Call the tinygl update function. */
+        tinygl_update();
+        
+    }
 }
 
 // 4, Initialisation of
