@@ -1,21 +1,19 @@
 /**
  * Program: UCFK4 Snake
+ * Module: game.c
  * Authors: Francis Phan, Richard Li
  * Description: A reconstruction of the old fashioned Nokia Snake
  *              game for the UC Fun Kit 4. This module covers the main
  *              functionalities of the game. 
-*/
+ */
 
 
 // 1. Modules used in this module --------------------------------
-#include "system.h"
+#include "../drivers/system.h"
+#include "navswitch.h"
 #include "tinygl.h"
 #include "pacer.h"
-#include "paddle.h"
-#include "messages.h"
-#include "font3x5_1.h"
-#include "font.h"
-#include "game.h"
+#include "../../fonts/font3x5_1.h"
 
 
 // 2. Intialisation of tinygl ------------------------------------
@@ -34,3 +32,5 @@ void game_init(void)
 {
     continue;
 }
+
+// 4, Initialisation of
