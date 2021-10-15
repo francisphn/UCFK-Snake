@@ -9,11 +9,13 @@
 
 
 // 1. Modules used in this module --------------------------------
-#include "../drivers/system.h"
+#include "system.h"
 #include "navswitch.h"
 #include "tinygl.h"
 #include "pacer.h"
-#include "../../fonts/font3x5_1.h"
+#include "../fonts/font3x5_1.h"
+
+#include "snake.h"
 
 
 // 2. Intialisation of tinygl ------------------------------------
