@@ -34,8 +34,8 @@ void tiny_init(void)
     tinygl_text_dir_set (TINYGL_TEXT_DIR_ROTATE); // horizontal
 }
 
-// 3. Game initialization module ---------------------------------
 
+// 3. Game initialization module ---------------------------------
 void snake_init(void)
 {
     system_init(); // Intialise system
@@ -44,12 +44,11 @@ void snake_init(void)
 }
 
 
-// Main function -------------------------------------------------
 
-int main (void)
+// Main function -------------------------------------------------
+int main(void)
 {
     snake_init(); // Call the game initialisation module
     welcome_msg(); // Run the welcome msg module found in messages.c
-    lose_msg();
     return 0;
 }
