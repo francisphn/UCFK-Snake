@@ -17,7 +17,14 @@
 #define LED_OFF 0
 
 #define MENU_MSG "SNAKE\0"
-#define WIN_MSG "YOU WON"
-#define LOSE_MSG "YOU LOST"
+#define WIN_MSG "WELL PLAYED \0"
+#define LOSE_MSG "YOU LOST \0"
+
+
+// Signatures
+int msg_paced_loop(void);
+int welcome_msg(void);
+int win_msg(void);
+int lose_msg(void);
 
 #endif
