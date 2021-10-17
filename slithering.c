@@ -22,70 +22,122 @@
  */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "tinygl.h"
 #include "system.h"
+#include "tinygl.h"
+#include "pacer.h"
+#include "navswitch.h"
 
-#include "snake.h"
+#define LOOP_RATE 300
+#define SNAKE_SPEED 1
 
-/* make a new snake to begin the game. */
-void snake_make (Snake* snake)
+enum dir {DIR_N, DIR_E, DIR_S, DIR_W};
+
+typedef enum dir dir_t;
+
+struct snake
 {
-    Snake* new_head = malloc(sizeof(Snake));
-    Snake* new_tail = malloc(sizeof(Snake));
+    /* Current head of snake.  */
+    tinygl_point_t pos;
+    /* Current direction.  */
+    enum dir dir;
+};
 
-    new_head->x.pos = SNAKE_START_X_POS;
-    new_head->y.pos = SNAKE_START_Y_POS;
-    new_head->next = new_tail;
+typedef struct snake snake_t;
 
-    new_tail->x.pos = SNAKE_START_X_POS;
-    new_tail->y.pos = SNAKE_START_Y_POS;
-    new_tail->next = NULL;
-
-    snake->head = new_head;
-    snake->num_food_eating = 0;
-    snake->score = 0;
-    snake->direction = SNAKE_START_DIRECTION;
-}
-
-/* make a new snake to restart the game. */
-void snake_reset (Snake* snake)
+static snake_t snake_move (snake_t snake)
 {
-    Snake* current = snake->head;
-    Snake* prev = current;
-    while (current) {
-        prev = current;
-        current = current->next;
-        free(prev);
-    }
-    snake_make (snake);
-}
-
-/* set the snake's direction to be the given direction. */
-void snake_direction (Snake* snake, int8_t direction)
-{
-    snake->direction = direction;
-}
-
-void snake_move (Snake* snake)
-{
-    switch
+    switch (snake.dir)
     {
-        case NORTH:
-            snake.y.pos = snake.y.pos - 1;
+        case DIR_N:
+            snake.pos.y = snake.pos.y - 1;
             break;
 
-        case EAST:
-            snake.x.pos = snake.x.pos + 1;
+        case DIR_E:
+            snake.pos.x = snake.pos.x + 1;
             break;
 
-        case SOUTH:
-            snake.y.pos = snake.y.pos + 1;
+        case DIR_S:
+            snake.pos.y = snake.pos.y + 1;
             break;
 
-        case WEST:
-            snake.x.pos = snake.x.pos - 1;
+        case DIR_W:
+            snake.pos.x = snake.pos.x - 1;
             break;
     }
+    tinygl_draw_point (snake.pos, 1);
+    return snake;
 }
+
+static snake_t snake_turn_left (snake_t snake)
+{
+    dir_t newdir[] = {DIR_W, DIR_N, DIR_E, DIR_S};
+
+    snake.dir = newdir[snake.dir];
+    return snake;
+}
+
+static snake_t snake_turn_right (snake_t snake)
+{
+    dir_t newdir[] = {DIR_E, DIR_S, DIR_W, DIR_N};
+
+    snake.dir = newdir[snake.dir];
+    return snake;
+}
+
+static snake_t snake_turn_up (snake_t snake)
+{
+    dir_t newdir[] = {DIR_N, DIR_E, DIR_S, DIR_W};
+
+    snake.dir = newdir[snake.dir];
+    return snake;
+}
+
+static snake_t snake_turn_down (snake_t snake)
+{
+    dir_t newdir[] = {DIR_S, DIR_W, DIR_N, DIR_E};
+
+    snake.dir = newdir[snake.dir];
+    return snake;
+}
+
+int main (void)
+{
+    snake_t snake;
+    int tick = 0;
+
+    system_init ();
+
+    snake.dir = DIR_N;
+    snake.pos.x = 0;
+    snake.pos.y = TINYGL_HEIGHT - 1;
+
+    tinygl_init (LOOP_RATE);
+    navswitch_init();
+    pacer_init (LOOP_RATE);
+    tinygl_draw_point (snake.pos, 1);
+
+    while (1)
+    {
+        pacer_wait ();
+        //tinygl_clear ();
+        navswitch_update ();
+        tick = tick + 1;
+        if (tick > LOOP_RATE / SNAKE_SPEED)
+        {
+            tick = 0;
+            snake = snake_move (snake);
+        }
+        if (navswitch_push_event_p (NAVSWITCH_EAST)) {
+            snake = snake_turn_right (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_WEST)) {
+            snake = snake_turn_left (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_NORTH)) {
+            snake = snake_turn_up (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+            snake = snake_turn_down (snake);
+        }
+        tinygl_update ();
+    }
+    return 0;
+}
+
