@@ -1,72 +1,86 @@
-/*
- * snake.c
- *
- * Copyright 2021 Yinqin Li <yli356@cs19100bs>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- *
- *
- */
+/**
+ * Program: UCFK4 Snake
+ * Module: slithering.c
+ * Authors: Francis Phan, Richard Li
+ * Description: This module provides for some modules
+ *              to be simulate a snake on the LED matrix.
+ **/
 
 
+
+
+
+
+
+
+// Include header files
 #include "system.h"
 #include "tinygl.h"
 #include "pacer.h"
 #include "navswitch.h"
+#include "slithering.h"
 
-#define LOOP_RATE 300
-#define SNAKE_SPEED 1
 
-enum dir {DIR_N, DIR_E, DIR_S, DIR_W};
 
-typedef enum dir dir_t;
 
-struct snake
-{
-    /* Current head of snake.  */
-    tinygl_point_t pos;
-    /* Current direction.  */
-    enum dir dir;
-};
 
-typedef struct snake snake_t;
+/** snake_move 
+This function is called to increment or decrement the X or Y position of
+the snake head when it is called by another function. The purpose is to move
+the snake forward, that is, if it is called and the current direction of the
+snake is South, then the snake will move south. 
+    @param is to accept the snake struct itself. 
+    @effects tinygl will then draw this position 
+    @return it will return the updated snake struct, where by 
+            the direction of the snake struct has been moved by 1 step forward 
+**/
 
 static snake_t snake_move (snake_t snake)
 {
     switch (snake.dir)
     {
         case DIR_N:
-            snake.pos.y = snake.pos.y - 1;
+            snake.pos.y--;
             break;
 
         case DIR_E:
-            snake.pos.x = snake.pos.x + 1;
+            snake.pos.x++;
             break;
 
         case DIR_S:
-            snake.pos.y = snake.pos.y + 1;
+            snake.pos.y++;
             break;
 
         case DIR_W:
-            snake.pos.x = snake.pos.x - 1;
+            snake.pos.x--;
             break;
     }
+
     tinygl_draw_point (snake.pos, 1);
     return snake;
+
 }
+
+
+
+
+
+/** snake_move 
+This function is called to increment or decrement the X or Y position of
+the snake head when it is called by another function. The purpose is to move
+the snake forward, that is, if it is called and the current direction of the
+snake is South, then the snake will move south. 
+    @param is to accept the snake struct itself. 
+    @effects tinygl will then draw this position 
+    @return it will return the updated snake struct, where by 
+            the direction of the snake struct has been moved by 1 step forward 
+**/
+
+/** snake turn 
+These functions are called to turn the snake when controlled by the navswitch.
+    @param is to accept the snake struct itself. 
+    @return the snake struct that has been updated.
+ **/
 
 static snake_t snake_turn_left (snake_t snake)
 {
@@ -100,7 +114,7 @@ static snake_t snake_turn_down (snake_t snake)
     return snake;
 }
 
-int main (void)
+int control (void)
 {
     snake_t snake;
     int tick = 0;

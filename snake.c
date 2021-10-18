@@ -22,6 +22,7 @@
 
 #include "snake.h"
 #include "messages.h"
+#include "slithering.h"
 
 
 // 2. Intialisation of tinygl ------------------------------------
@@ -46,9 +47,47 @@ void snake_init(void)
 
 
 // Main function -------------------------------------------------
+
 int main(void)
 {
     snake_init(); // Call the game initialisation module
     welcome_msg(); // Run the welcome msg module found in messages.c
+
+    snake_t snake;
+    int tick = 0;
+
+    system_init ();
+
+    snake.dir = DIR_N;
+    snake.pos.x = 0;
+    snake.pos.y = TINYGL_HEIGHT - 1;
+
+    tinygl_init (LOOP_RATE);
+    navswitch_init();
+    pacer_init (LOOP_RATE);
+    tinygl_draw_point (snake.pos, 1);
+
+    while (1)
+    {
+        pacer_wait ();
+        //tinygl_clear ();
+        navswitch_update ();
+        tick = tick + 1;
+        if (tick > LOOP_RATE / SNAKE_SPEED)
+        {
+            tick = 0;
+            snake = snake_move (snake);
+        }
+        if (navswitch_push_event_p (NAVSWITCH_EAST)) {
+            snake = snake_turn_right (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_WEST)) {
+            snake = snake_turn_left (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_NORTH)) {
+            snake = snake_turn_up (snake);
+        } else if (navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+            snake = snake_turn_down (snake);
+        }
+        tinygl_update ();
+    }
     return 0;
 }
