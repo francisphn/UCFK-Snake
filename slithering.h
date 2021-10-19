@@ -95,4 +95,22 @@ struct apple
 };
 typedef struct apple apple_t;
 
+
+int control(int level);
+int level_chooser(void);
+int coord(void);
+int tiny_text_init(void) ;
+snake_t snake_init(void);
+int check_boundary_cross(snake_t snake);
+int randomiser(int upper, int lower);
+snake_t snake_eat(snake_t snake);
+snake_t snake_slither_forward(snake_t snake);
+int check_collision(snake_t snake);
+snake_t navswitch_snake(snake_t my_snake);
+apple_t make_apple(snake_t snake);
+int level_chooser(void);
+int display_text(int text_to_display, int require_exit_by_pushing_navswitch);
+
+
+
 #endif
