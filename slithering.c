@@ -83,7 +83,8 @@ int level_chooser(void)
 
     tinygl_clear();
     tiny_text_init();
-    tinygl_text("1");
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
+    tinygl_text("L1");
 
     while(1)
     {
@@ -99,14 +100,14 @@ int level_chooser(void)
             }
         
             if (level == 1) {
-                tinygl_text("1");
+                tinygl_text("L1");
             } else if (level == 2) {
-                tinygl_text("2");
+                tinygl_text("L2");
             } else if (level == 3) {
-                tinygl_text("3");
+                tinygl_text("L3");
             }
 
-        } else if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+        } else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
 
             if (level == 1) {
                 level = 3;
@@ -115,12 +116,15 @@ int level_chooser(void)
             }
         
             if (level == 1) {
-                tinygl_text("1");
+                tinygl_text("L1");
             } else if (level == 2) {
-                tinygl_text("2");
+                tinygl_text("L2");
             } else if (level == 3) {
-                tinygl_text("3");
+                tinygl_text("L3");
             }
+        } else if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+            tinygl_clear();
+            return level;
         }
     }
     return 0;
@@ -189,7 +193,10 @@ snake_t snake_slither_forward(snake_t snake)
 int check_boundary_cross(snake_t snake)
 {
     if (snake.head.x < 0 || snake.head.x > 4 || snake.head.y < 0 || snake.head.y > 6) {
-        display_text(GAME_OVER_TEXT, NO_EXIT);
+        int has_exited = display_text(GAME_OVER_TEXT, PUSH_NAVSWITCH_TO_EXIT);
+        if (has_exited == 1) {
+            coord();
+        }
     }
     return 0;
 }
@@ -200,7 +207,10 @@ int check_collision(snake_t snake)
 {
     for (int i = 0; i < 10; i++) {
         if (snake.head.x == snake.body[i].x && snake.head.y == snake.body[i].y) {
-            display_text(GAME_OVER_TEXT, NO_EXIT);
+            int has_exited = display_text(GAME_OVER_TEXT, PUSH_NAVSWITCH_TO_EXIT);
+            if (has_exited == 1) {
+                coord();
+            }
         }
     }
     return 0;
@@ -286,12 +296,18 @@ snake t snake_turn_body(snake_t my_snake)
 }**/
 
 /** THE CONTROL FUNCTION **/
-int control(void)
+int control(int level)
 {
     /** Declare and initialise a snake **/
     snake_t my_snake;
     my_snake = snake_init();
     int tick = 0;
+    float snake_speed = 1.25;
+    if (level == 2) {
+        snake_speed = 1.5;
+    } else if (level == 3) {
+        snake_speed = 1.75;
+    }
 
     /** A flag to signal that the game has just started **/
     int game_start = GAME_FIRST_START;
@@ -310,7 +326,7 @@ int control(void)
 
         tick++;
 
-        if (tick > LOOP_RATE / SNAKE_SPEED) {
+        if (tick > LOOP_RATE / snake_speed) {
             tick = 0;
             my_snake = navswitch_snake(my_snake);
             my_snake = snake_slither_forward(my_snake);
@@ -329,8 +345,7 @@ int control(void)
     return 0;
 }
 
-
-int main(void) 
+int coord(void)
 {
     system_init();
     tinygl_init(LOOP_RATE);
@@ -342,7 +357,13 @@ int main(void)
     if (outcome == 1) {
         tinygl_clear();
         int level = level_chooser();
-        control();
+        control(level);
     }
-
+    return 0;
 }
+
+int main(void) 
+{
+    coord();
+}
+
