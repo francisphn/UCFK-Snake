@@ -22,6 +22,8 @@
 #include "display.h"
 #include "../fonts/font3x5_1.h"
 #include "font.h"
+//#include "piezo.h"
+//#include "mmelody.h"
 
 #include "slithering.h"
 
@@ -76,6 +78,12 @@ int display_text(int text_to_display, int require_exit_by_pushing_navswitch)
     }
     return 0;
 }
+
+/** TODO: DISPLAY SCORE AFTER PRESS
+int display_score(int my_score) 
+{
+
+}**/
 
 int level_chooser(void)
 {
@@ -175,12 +183,13 @@ snake_t snake_slither_forward(snake_t snake)
             snake.head.x--;
             break;
     }
-
-    tinygl_draw_point(snake.head, 1);
-    /**
+    
     for (int index = 0; index < 10; index++) {
-        
-    }**/
+        if (snake.body[index].x == 8 && snake.body[index].y == 8) {
+            tinygl_draw_point(snake.body[index], 1);
+        }
+    }
+    tinygl_draw_point(snake.head, 1);
 
     return snake;
 }
@@ -273,6 +282,7 @@ apple_t make_apple(snake_t snake)
             }
         }
     }
+
     tinygl_draw_point(my_apple.location, 1);
     
     return my_apple;
@@ -296,6 +306,7 @@ snake_t snake_grow(snake_t my_snake)
             my_snake.body[0].x = my_snake.head.x + 1;
             my_snake.body[0].y = my_snake.head.y;
         }
+        tinygl_draw_point(my_snake.body[0], 1);
     } else if (my_snake.body_length > 1) {
         for (int index = 1; index < 10; index++) { /** We want to be using index 0 for the body array **/
             if (my_snake.body[index].x == 8 && my_snake.body[index].y == 8) {
@@ -313,6 +324,8 @@ snake_t snake_grow(snake_t my_snake)
                     my_snake.body[index].x = my_snake.body[index - 1].x + 1;
                     my_snake.body[index].y = my_snake.body[index - 1].y;
                 }
+                tinygl_draw_point(my_snake.body[index], 1);
+                break;
             }
         }
     }
@@ -329,18 +342,21 @@ int control(int level)
     snake_t my_snake;
     my_snake = snake_init();
     int tick = 0;
-    float snake_speed = 1.5;
+    float snake_speed = 1.75;
+    float speed_increment = 0.133;
     if (level == 2) {
-        snake_speed = 1.75;
+        speed_increment = 0.166;
     } else if (level == 3) {
-        snake_speed = 2;
+        speed_increment = 0.2;
     }
     int restart_check_1 = 0; 
     int restart_check_2 = 0;
     /** A flag to signal that the game has just started **/
     int game_start = GAME_FIRST_START;
     apple_t my_apple;
-    int user_score = 0;
+    int won_user_pressed;
+    int point_disappear_please = 0;
+    apple_t previous_apple;
 
     while (1) {
         /** Is game over? Check if snake is dead - snake either collided or crossed boundary of matrix **/
@@ -350,6 +366,10 @@ int control(int level)
             if (restart_check_1 == RESTART || restart_check_2 == RESTART) {
                 return RESTART;
             }
+        }
+        if (point_disappear_please == 1) {
+            point_disappear_please = 0;
+            tinygl_draw_point(previous_apple.location, 0);
         }
 
         /** Hold the pacer. The pacer_init() is found in the main function 
@@ -371,7 +391,7 @@ int control(int level)
 
         tick++;
 
-        if (tick > LOOP_RATE / snake_speed) {
+        if (tick > 250 / snake_speed) {
             tick = 0;
             my_snake = snake_slither_forward(my_snake);
 
@@ -380,9 +400,20 @@ int control(int level)
                 game_start = GAME_ALREADY_STARTED;
             } else {
                 if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                    user_score++;
+                    tinygl_draw_point(my_apple.location, 0);
+                    tinygl_draw_point(my_apple.location, 1);
                     my_snake.body_length++;
-                    snake_speed += 0.2;
+                    snake_speed += speed_increment;
+                    point_disappear_please = 1;
+                    previous_apple = my_apple;
+                    
+                    
+                    if (my_snake.body_length == 10) {
+                        won_user_pressed = display_text(2, PUSH_NAVSWITCH_TO_EXIT);
+                        if (won_user_pressed == 2) {
+                            return RESTART;
+                        }
+                    }
                     my_snake = snake_grow(my_snake);
                     my_apple = make_apple(my_snake);
                 }
