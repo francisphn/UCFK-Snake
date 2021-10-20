@@ -3,7 +3,7 @@ This game was written by Francis Phan and Richard Li as an assignment for ENCE26
 
 Before it could be played, it is necessary that the UCFK4 drivers and documents are on your computer. If you have not had them already, they can be cloned by using the command `git clone https://eng-git.canterbury.ac.nz/mph/ence260-ucfk4`.
 
-Once you have got the drivers cloned, change your directory to `/assignment/ and then clone this repository inside that directory. Then change your directory to '/group_509/'
+Once you have got the drivers cloned, change your directory to `/assignment/` and then clone this repository inside that directory. Then change your directory to '/group_509/'
 
 Make sure your ENCE260 UC Fun Kit 4 has been plugged into the computer. From there, run the following commands to compile the code and load it onto your UCFK4:
 1. `make clean`
