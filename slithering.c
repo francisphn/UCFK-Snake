@@ -145,11 +145,6 @@ int randomiser(int upper, int lower)
  * @param the snake itself
  * @return the snake itself **/
 
-snake_t snake_eat(snake_t snake)
-{
-    snake.length++;
-    return snake;
-}
 
 /** Automatically slither the snake
  * @param the snake itself
@@ -157,25 +152,6 @@ snake_t snake_eat(snake_t snake)
  *          and the tail of the snake decremented to simulate slithering **/
 
 /** TODO: NAVSWITCH TO CONTROL SNAKE**/
-/**
-snake_t snake_turn(snake_t snake)
-{
-    //display_pixel_set(0, 1, 1);
-    //-----
-    navswitch_update();
-    if (navswitch_push_event_p(NAVSWITCH_EAST)) {
-        display_pixel_set(0, 1, 1);
-        snake.head_direction = EAST;
-    } else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-        snake.head_direction = SOUTH;
-    } else if (navswitch_push_event_p(NAVSWITCH_WEST)) {
-        snake.head_direction = WEST;
-    } else if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-        snake.head_direction = NORTH;
-    }
-
-    return snake;
-}**/
 
 snake_t snake_slither_forward(snake_t snake)
 {
@@ -201,6 +177,10 @@ snake_t snake_slither_forward(snake_t snake)
     }
 
     tinygl_draw_point(snake.head, 1);
+    /**
+    for (int index = 0; index < 10; index++) {
+        
+    }**/
 
     return snake;
 }
@@ -238,6 +218,39 @@ int check_collision(snake_t snake)
     return 0;
 }
 
+
+
+snake_t snake_init(void)
+{
+    /** A snake has 11 parts: 1 part is called the 'head', remaining 10 parts are the 'body' 
+     * The snake, when the game first start will have a head.
+     * The snake has to eat one apple to grow by one part of the body.
+     * We will have to initialise all these 11 parts but we only show the part slithering
+     * if the snake has so eaten the apple **/
+
+    snake_t my_snake;
+
+    /** Initialise the head of the snake **/
+    my_snake.head.x = randomiser(4, 0);
+    my_snake.head.y = randomiser(6, 0);
+    my_snake.head_direction = NORTH;
+
+    /** Loop to initialise each part **/
+    /** Initialisation of the location of this part will take place by using a fake location 
+     * This fake location should be 8, 8 **/
+
+    for (int index = 0; index < 10; index++) {
+        my_snake.body[index].x = 8;
+        my_snake.body[index].y = 8;
+        my_snake.body_direction[index] = NORTH;
+    }
+    
+    my_snake.body_length = 0; // Including the head of the snake
+
+    return my_snake;
+}
+
+
 /** Make an apple with a random location on the matrix. This location shouldn't be where the snake
  * is at the moment, nor will it be at the previous location of the previous apple 
  * @return an apple defined by the apple_t struct **/
@@ -265,44 +278,47 @@ apple_t make_apple(snake_t snake)
     return my_apple;
 }
 
-snake_t snake_init(void)
+snake_t snake_grow(snake_t my_snake)
 {
-    /** A snake has 11 parts: 1 part is called the 'head', remaining 10 parts are the 'body' 
-     * The snake, when the game first start will have a head.
-     * The snake has to eat one apple to grow by one part of the body.
-     * We will have to initialise all these 11 parts but we only show the part slithering
-     * if the snake has so eaten the apple **/
-
-    snake_t my_snake;
-
-    /** Initialise the head of the snake **/
-    my_snake.head.x = randomiser(4, 0);
-    my_snake.head.y = randomiser(6, 0);
-    my_snake.head_direction = NORTH;
-
-    /** Loop to initialise each part **/
-    /** Initialisation of the location of this part will take place by using a fake location 
-     * This fake location should be 8, 8 **/
-
-    for (int index = 0; index < 10; index++) {
-        my_snake.body[index].x = 8;
-        my_snake.body[index].x = 8;
-        my_snake.body_direction[index] = NORTH;
+    /** When the snake first eats an apple, body_length is 1 **/
+    if (my_snake.body_length == 1) {
+        my_snake.body_direction[0] = my_snake.head_direction;
+        if (my_snake.head_direction == NORTH) {
+            my_snake.body[0].x = my_snake.head.x;
+            my_snake.body[0].y = my_snake.head.y + 1;
+        } else if (my_snake.head_direction == SOUTH) {
+            my_snake.body[0].x = my_snake.head.x;
+            my_snake.body[0].y = my_snake.head.y - 1;
+        } else if (my_snake.head_direction == EAST) {
+            my_snake.body[0].x = my_snake.head.x - 1;
+            my_snake.body[0].y = my_snake.head.y;
+        } else if (my_snake.head_direction == WEST) {
+            my_snake.body[0].x = my_snake.head.x + 1;
+            my_snake.body[0].y = my_snake.head.y;
+        }
+    } else if (my_snake.body_length > 1) {
+        for (int index = 1; index < 10; index++) { /** We want to be using index 0 for the body array **/
+            if (my_snake.body[index].x == 8 && my_snake.body[index].y == 8) {
+                my_snake.body_direction[index] = my_snake.body_direction[index - 1];
+                if (my_snake.body_direction[index - 1] == NORTH) {
+                    my_snake.body[index].x = my_snake.body[index - 1].x;
+                    my_snake.body[index].y = my_snake.body[index - 1].y + 1;
+                } else if (my_snake.body_direction[index - 1] == SOUTH) {
+                    my_snake.body[index].x = my_snake.body[index - 1].x;
+                    my_snake.body[index].y = my_snake.body[index - 1].y - 1;
+                } else if (my_snake.body_direction[index - 1] == EAST) {
+                    my_snake.body[index].x = my_snake.body[index - 1].x - 1;
+                    my_snake.body[index].y = my_snake.body[index - 1].y;
+                } else if (my_snake.body_direction[index - 1] == WEST) {
+                    my_snake.body[index].x = my_snake.body[index - 1].x + 1;
+                    my_snake.body[index].y = my_snake.body[index - 1].y;
+                }
+            }
+        }
     }
-    
-    my_snake.length = 1;
-
     return my_snake;
 }
 
-
-
-
-/**
-snake t snake_turn(snake_t my_snake)
-{
-    
-}**/
 
 /** THE CONTROL FUNCTION **/
 int control(int level)
@@ -323,9 +339,12 @@ int control(int level)
     int restart_check_2 = 0;
     /** A flag to signal that the game has just started **/
     int game_start = GAME_FIRST_START;
+    apple_t my_apple;
+    int user_score = 0;
 
     while (1) {
-        if (game_start == GAME_ALREADY_STARTED) { /** Is game over? Check if snake is dead **/
+        /** Is game over? Check if snake is dead - snake either collided or crossed boundary of matrix **/
+        if (game_start == GAME_ALREADY_STARTED) { 
             restart_check_1 = check_boundary_cross(my_snake); /** Check if the snake head has crossed the matrix boundary **/
             restart_check_2 = check_collision(my_snake); /** Check if the snake had has collided with any of its body's 10 parts **/
             if (restart_check_1 == RESTART || restart_check_2 == RESTART) {
@@ -333,12 +352,13 @@ int control(int level)
             }
         }
 
-        pacer_wait(); /** Hold the pacer. The pacer_init() is found in the main function **/
+        /** Hold the pacer. The pacer_init() is found in the main function 
+         * Also do an update on the navswitch continually and update tinygl **/
+        pacer_wait(); 
         navswitch_update();
         tinygl_update();
 
-        // tinygl_draw_point(my_snake.head, 1);
-
+        /** Navswitch turn of the snake **/
         if (navswitch_push_event_p(NAVSWITCH_EAST) == 1) {
             my_snake.head_direction = EAST;
         } else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
@@ -356,16 +376,18 @@ int control(int level)
             my_snake = snake_slither_forward(my_snake);
 
             if (game_start == GAME_FIRST_START) {
-                make_apple(my_snake);
+                my_apple = make_apple(my_snake);
                 game_start = GAME_ALREADY_STARTED;
-            } else { // if the apple has been eaten, show a new apple.
-                make_apple(my_snake);
+            } else {
+                if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
+                    user_score++;
+                    my_snake.body_length++;
+                    snake_speed += 0.2;
+                    my_snake = snake_grow(my_snake);
+                    my_apple = make_apple(my_snake);
+                }
             }
-
-            /** TODO: if the snake eats the apple, display a new one elsewhere 
-             * that isn't the current apple location and not where the snake is**/
         }
-
     }
 
     return 0;

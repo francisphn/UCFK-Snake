@@ -43,6 +43,8 @@
 #define SNAKE_START_Y_POS 1
 #define SNAKE_START_DIRECTION NORTH
 
+#define SPEEED_INCREMENT 1.005
+
 /* strings to display on the LED matrix */
 #define SNAKE_TEXT 0
 #define GAME_OVER_TEXT 1
@@ -84,8 +86,8 @@ struct snake
     direction_t head_direction; /* Current direction.  */
 
     tinygl_point_t body[10]; // Current body of snake
-    direction_t body_direction[10]; 
-    uint16_t length; // Current length of the snake
+    direction_t body_direction[10];
+    uint16_t body_length; // Current length of the snake
 };
 typedef struct snake snake_t;
 
