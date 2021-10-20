@@ -28,3 +28,8 @@ We've added some complexity into the program for extra marks.
 4. It is possible to restart the game from the Game Over Menu, rather than having to run `make program` again.
 5. There are different levels: 1, 2 and 3. The higher the level, the acceleration of the snake will increase after each apple is eaten.
 6. The snake dies when it collides with itself, or any of the boundary.
+
+## To Do List
+1. The snake head must not appear at the boundary.
+2. Separate the file.
+3. The music 

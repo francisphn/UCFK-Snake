@@ -139,6 +139,7 @@ int level_chooser(void)
 }
 
 
+
 /** A function to generate a random integer.
  * @param upper bound, lower bound
  * @return an integer within the bound inclusive **/
@@ -194,6 +195,14 @@ snake_t snake_slither_forward(snake_t snake)
         }
     }
 
+    for  (int index = 1; index < 10; index++) {
+        tinygl_draw_point(snake.body[index], 0);
+        if (snake.body[index].x != 8 && snake.body[index].y != 8) {
+            snake.body_direction[index] = previous_snake.body_direction[index- 1];
+            snake.body[index] = previous_snake.body[index - 1];
+            tinygl_draw_point(snake.body[index], 1);
+        }
+    }
 
     tinygl_draw_point(snake.head, 1);
 
