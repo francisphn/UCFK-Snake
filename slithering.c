@@ -330,7 +330,7 @@ snake_t snake_grow(snake_t my_snake)
                     my_snake.body[index].x = my_snake.body[index - 1].x + 1;
                     my_snake.body[index].y = my_snake.body[index - 1].y;
                 }
-                //tinygl_draw_point(my_snake.body[index], 1);
+                tinygl_draw_point(my_snake.body[index], 1);
                 break;
             }
         }
@@ -465,7 +465,7 @@ int control(int level)
                 game_start = GAME_ALREADY_STARTED;
         } else {
             if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                tinygl_draw_point(my_apple.location, 0);
+                //tinygl_draw_point(my_apple.location, 0);
                 my_snake.body_length++;
                 snake_speed += speed_increment;
                 
