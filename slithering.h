@@ -37,7 +37,6 @@
 #define LED_ON 1
 #define LED_OFF 0
 
-
 /* Define the snake location and direction */
 #define SNAKE_START_X_POS 1
 #define SNAKE_START_Y_POS 1

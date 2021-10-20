@@ -53,11 +53,11 @@ int display_text(int text_to_display, int require_exit_by_pushing_navswitch)
     tiny_text_init();
 
     if (text_to_display == 0) {
-        tinygl_text("SNAKE");
+        tinygl_text("SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE");
     } else if (text_to_display == 1) {
-        tinygl_text("GAME OVER");
+        tinygl_text("GAME OVER GAME OVER GAME OVER GAME OVER GAME OVER");
     } else if (text_to_display == 2) {
-        tinygl_text("WELL PLAYED");
+        tinygl_text("WELL PLAYED WELL PLAYED WELL PLAYED WELL PLAYED WELL PLAYED");
     }
     navswitch_init();
     
@@ -166,6 +166,7 @@ snake_t snake_slither_forward(snake_t snake)
     /** MOVE THE HEAD **/ 
 
     //snake = snake_turn(snake);
+    snake_t previous_snake = snake;
 
     tinygl_draw_point(snake.head, 0);
 
@@ -184,11 +185,16 @@ snake_t snake_slither_forward(snake_t snake)
             break;
     }
     
-    for (int index = 0; index < 10; index++) {
-        if (snake.body[index].x == 8 && snake.body[index].y == 8) {
+    for (int index = 0; index < 1; index++) {
+        tinygl_draw_point(snake.body[index], 0);
+        if (snake.body[index].x != 8 && snake.body[index].y != 8) {
+            snake.body_direction[index] = snake.head_direction;
+            snake.body[index] = previous_snake.head;
             tinygl_draw_point(snake.body[index], 1);
         }
     }
+
+
     tinygl_draw_point(snake.head, 1);
 
     return snake;
@@ -240,8 +246,8 @@ snake_t snake_init(void)
     snake_t my_snake;
 
     /** Initialise the head of the snake **/
-    my_snake.head.x = randomiser(4, 0);
-    my_snake.head.y = randomiser(6, 0);
+    my_snake.head.x = randomiser(3, 1);
+    my_snake.head.y = randomiser(5, 1);
     my_snake.head_direction = NORTH;
 
     /** Loop to initialise each part **/
@@ -324,7 +330,7 @@ snake_t snake_grow(snake_t my_snake)
                     my_snake.body[index].x = my_snake.body[index - 1].x + 1;
                     my_snake.body[index].y = my_snake.body[index - 1].y;
                 }
-                tinygl_draw_point(my_snake.body[index], 1);
+                //tinygl_draw_point(my_snake.body[index], 1);
                 break;
             }
         }
@@ -332,6 +338,64 @@ snake_t snake_grow(snake_t my_snake)
     return my_snake;
 }
 
+int display_score(snake_t my_snake)
+{
+    tiny_text_init();
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
+    tinygl_clear(); // clear
+    switch(my_snake.body_length) {
+        case 0:
+            tinygl_text("00");
+            break;
+        case 1:
+            tinygl_text("01");
+            break;
+        case 2:  
+            tinygl_text("02");
+            break;
+        case 3:  
+            tinygl_text("03");
+            break;
+        case 4:  
+            tinygl_text("04");
+            break;
+        case 5:  
+            tinygl_text("05");
+            break;
+        case 6:  
+            tinygl_text("06");
+            break;
+        case 7:  
+            tinygl_text("07");
+            break;
+        case 8:  
+            tinygl_text("08");
+            break;
+        case 9:  
+            tinygl_text("09");
+            break;
+        case 10:  
+            tinygl_text("10");
+            break;
+    }
+
+
+    navswitch_init();
+    pacer_init (LOOP_RATE);
+
+    while (1)
+    {
+        pacer_wait(); /* Wait for next tick.  */
+        tinygl_update();
+        navswitch_update();
+
+        if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+            return 1;
+        } 
+
+    }
+    return 0;
+}
 
 /** THE CONTROL FUNCTION **/
 int control(int level)
@@ -342,12 +406,12 @@ int control(int level)
     snake_t my_snake;
     my_snake = snake_init();
     int tick = 0;
-    float snake_speed = 1.75;
-    float speed_increment = 0.133;
+    float snake_speed = 2;
+    float speed_increment = 0.2;
     if (level == 2) {
-        speed_increment = 0.166;
+        speed_increment = 0.3;
     } else if (level == 3) {
-        speed_increment = 0.2;
+        speed_increment = 0.4;
     }
     int restart_check_1 = 0; 
     int restart_check_2 = 0;
@@ -355,8 +419,7 @@ int control(int level)
     int game_start = GAME_FIRST_START;
     apple_t my_apple;
     int won_user_pressed;
-    int point_disappear_please = 0;
-    apple_t previous_apple;
+    int menu_score_press;
 
     while (1) {
         /** Is game over? Check if snake is dead - snake either collided or crossed boundary of matrix **/
@@ -364,12 +427,11 @@ int control(int level)
             restart_check_1 = check_boundary_cross(my_snake); /** Check if the snake head has crossed the matrix boundary **/
             restart_check_2 = check_collision(my_snake); /** Check if the snake had has collided with any of its body's 10 parts **/
             if (restart_check_1 == RESTART || restart_check_2 == RESTART) {
-                return RESTART;
+                menu_score_press = display_score(my_snake);
+                if (menu_score_press == 1) {
+                    return RESTART;
+                }
             }
-        }
-        if (point_disappear_please == 1) {
-            point_disappear_please = 0;
-            tinygl_draw_point(previous_apple.location, 0);
         }
 
         /** Hold the pacer. The pacer_init() is found in the main function 
@@ -391,32 +453,35 @@ int control(int level)
 
         tick++;
 
-        if (tick > 250 / snake_speed) {
+        
+
+        if (tick > 300 / snake_speed) {
             tick = 0;
             my_snake = snake_slither_forward(my_snake);
+        }
 
-            if (game_start == GAME_FIRST_START) {
+        if (game_start == GAME_FIRST_START) {
                 my_apple = make_apple(my_snake);
                 game_start = GAME_ALREADY_STARTED;
-            } else {
-                if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                    tinygl_draw_point(my_apple.location, 0);
-                    tinygl_draw_point(my_apple.location, 1);
-                    my_snake.body_length++;
-                    snake_speed += speed_increment;
-                    point_disappear_please = 1;
-                    previous_apple = my_apple;
-                    
-                    
-                    if (my_snake.body_length == 10) {
-                        won_user_pressed = display_text(2, PUSH_NAVSWITCH_TO_EXIT);
-                        if (won_user_pressed == 2) {
+        } else {
+            if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
+                tinygl_draw_point(my_apple.location, 0);
+                my_snake.body_length++;
+                snake_speed += speed_increment;
+                
+                
+                if (my_snake.body_length == 10) {
+                    won_user_pressed = display_text(2, PUSH_NAVSWITCH_TO_EXIT);
+                    if (won_user_pressed == 1) {
+                        menu_score_press = display_score(my_snake);
+                        if (menu_score_press == 1) {
                             return RESTART;
                         }
                     }
-                    my_snake = snake_grow(my_snake);
-                    my_apple = make_apple(my_snake);
                 }
+
+                my_snake = snake_grow(my_snake);
+                my_apple = make_apple(my_snake);
             }
         }
     }
