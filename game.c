@@ -1,6 +1,6 @@
 /**
  * Program: UCFK4 Snake
- * Module: slithering.c
+ * Module: game.c
  * Authors: Francis Phan, Richard Li
  * Description: This module provides for some modules
  *              to be simulate a snake on the LED matrix.
