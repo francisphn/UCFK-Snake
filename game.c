@@ -27,7 +27,6 @@
 #include "game.h"
 #include "messages.h"
 
-
 /** A function to generate a random integer.
  * @param upper bound, lower bound
  * @return an integer within the bound inclusive **/

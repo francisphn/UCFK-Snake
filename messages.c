@@ -2,7 +2,7 @@
  * Program: UCFK4 Snake
  * Module: messages.c
  * Authors: Francis Phan, Richard Li
- * Description: Tinygl modules to display various menus and texts in the game.
+ * Description: Tinygl modules to display various menus and texts in the
 **/
 
 
