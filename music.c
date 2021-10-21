@@ -1,6 +1,6 @@
 /**
  * Program: UCFK4 Snake
- * Module: game.c
+ * Module: music.h
  * Authors: Francis Phan, Richard Li
  * Description: Play some tunes.
 **/
