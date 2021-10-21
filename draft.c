@@ -1,3 +1,14 @@
+/**
+ * Program: UCFK4 Snake
+ * Module: draft.c
+ * Authors: Francis Phan, Richard Li
+ * Description: This module provides for some modules
+ *              to be chosen the lever of the snake game.
+**/
+
+
+/** INCLUDE HEADER FILES  **/
+
 int max_score_chooser(void)
 {
     int max_score = 10;
