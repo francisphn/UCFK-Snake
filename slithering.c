@@ -300,7 +300,7 @@ int control(int level)
 
         tick++;
 
-        
+        // Play buzz as snake slithers
         if (tick > 200 / snake_speed) {
             if (navswitch_pressed_play_buzz != 1) {
                 pio_output_toggle (PIEZO1_PIO);
@@ -310,17 +310,21 @@ int control(int level)
             }
             
         }
+
+        // Snake slithers
         if (tick > 300 / snake_speed) {
             tick = 0;
             my_snake = snake_slither_forward(my_snake);
         }
 
+        // Make the first apple
         if (game_start == GAME_FIRST_START) {
                 my_apple = make_apple(my_snake);
                 game_start = GAME_ALREADY_STARTED;
-        } else {
+        } else { // Make apple after snake has eaten the previous one
             if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                /**
+                
+                /** Music to be implemented here
                 while (period < TASK_RATE / TWEETER_TASK_RATE) {
                     int music_data = 0;
                     int* music_data_ptr = &music_data;
@@ -330,12 +334,13 @@ int control(int level)
                 }
 
                 pio_output_toggle(PIEZO_PIO);
-                pio_output_toggle(PIEZO_PIO);**/
-
+                pio_output_toggle(PIEZO_PIO);
+                
                 system_init ();
                 tweeter_task_init ();
-                tune_task_init ();
-                
+                tune_task_init ();**/
+
+                   
                 my_apple = make_apple(my_snake);
                 tinygl_draw_point(my_apple.location, 0);
                 tinygl_draw_point(my_apple.location, 1);
