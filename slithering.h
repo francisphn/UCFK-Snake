@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "system.h"
 #include "tinygl.h"
 #include "pacer.h"
@@ -22,7 +23,7 @@
 #include "../fonts/font3x5_1.h"
 #include "font.h"
 #include "pio.h"
-#include "button.h"
+
 /** CONSTANTS USED IN SLITHERING.C ------------------------------------------------------------------ **/
 
 /* Basic constants */

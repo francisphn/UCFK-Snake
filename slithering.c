@@ -254,7 +254,6 @@ int control(int level)
     
     pio_config_set (PIEZO1_PIO, PIO_OUTPUT_LOW);
     pio_config_set (PIEZO2_PIO, PIO_OUTPUT_HIGH);
-    pio_config_set (TEST_PIO, PIO_OUTPUT_HIGH);
 
     while (1) {
         /** Is game over? Check if snake is dead - snake either collided or crossed boundary of matrix **/

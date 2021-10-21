@@ -17,15 +17,14 @@ all: slithering.out
 
 # Compile: create object files from C source files.
 
-slithering.o: slithering.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font3x5_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../extra/mmelody.h ../../extra/ticker.h ../../extra/tweeter.h ../../utils/task.h
+slithering.o: slithering.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font3x5_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 game.o: game.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font3x5_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../extra/mmelody.h ../../extra/ticker.h ../../extra/tweeter.h ../../utils/task.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-messages.o: messages.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font3x5_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../extra/mmelody.h ../../extra/ticker.h ../../extra/tweeter.h ../../utils/task.h
+messages.o: messages.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font3x5_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h 
 	$(CC) -c $(CFLAGS) $< -o $@
-
 
 task.o: ../../utils/task.c ../../drivers/avr/system.h ../../drivers/avr/timer.h ../../utils/task.h
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -64,7 +63,7 @@ ticker.o: ../../extra/ticker.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # Link: create output file (executable) from object files.
-slithering.out: slithering.o messages.o game.o mmelody.o pio.o system.o timer.o display.o ledmat.o navswitch.o font.o pacer.o tinygl.o ticker.o tweeter.o task.o
+slithering.out: slithering.o messages.o game.o pio.o system.o timer.o display.o ledmat.o navswitch.o font.o pacer.o tinygl.o ticker.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 #include "system.h"
 #include "tinygl.h"
@@ -21,7 +20,6 @@
 #include "../fonts/font3x5_1.h"
 #include "font.h"
 #include "pio.h"
-#include "button.h"
 
 #include "slithering.h"
 #include "game.h"
