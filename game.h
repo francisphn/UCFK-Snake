@@ -1,6 +1,6 @@
 /**
  * Program: UCFK4 Snake
- * Module: Header file for game.h
+ * Module: Header file for game.c
  * Authors: Francis Phan, Richard Li
 **/
 
