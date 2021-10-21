@@ -9,11 +9,10 @@
 #define SLITHERING_H
 
 
-/** INCLUDE HEADER FILES  **/
+/** HEADER FILES  **/
 
 #include <stdint.h>
 #include <stdlib.h>
-
 #include "system.h"
 #include "tinygl.h"
 #include "pacer.h"
@@ -22,45 +21,30 @@
 #include "display.h"
 #include "../fonts/font3x5_1.h"
 #include "font.h"
+#include "pio.h"
+#include "button.h"
+/** CONSTANTS USED IN SLITHERING.C ------------------------------------------------------------------ **/
 
-
-
-/** CONSTANTS USED IN SLITHERING.C **/
-
+/* Basic constants */
 #define START_SNAKE_MODE 0
 #define APPLE_MODE 1
 #define PACER_RATE 500
 #define LOOP_RATE 300
-#define SNAKE_SPEED 1.5
 #define MESSAGE_RATE 20
 #define BUTTON_RATE 300
 #define LED_ON 1
 #define LED_OFF 0
-
-/* Define the snake location and direction */
-#define SNAKE_START_X_POS 1
-#define SNAKE_START_Y_POS 1
-#define SNAKE_START_DIRECTION NORTH
-
-#define SPEEED_INCREMENT 1.005
 
 /* strings to display on the LED matrix */
 #define SNAKE_TEXT 0
 #define GAME_OVER_TEXT 1
 #define WELL_PLAYED_TEXT 2
 
-/* Game Level */
-#define GAME_EASY 0
-#define GAME_MEDIUM 1  
-#define GAME_ADVANCED 2  
-
 /* Navswitch scanner as strings are displayed */
 #define PUSH_NAVSWITCH_TO_EXIT 1
 #define NO_EXIT 0
 
-#define NAVSWITCH_PUSH_IDENTIFIER_SCAN_PUSH_DOWN_ONLY 0
-#define NAVSWITCH_PUSH_IDENTIFIER_SCAN_ALL 1
-
+/* Navswtich directions */
 #define NAVSWITCH_PUSHED_DOWN 0
 #define NAVSWITCH_PUSHED_NORTH 1
 #define NAVSWITCH_PUSHED_SOUTH 2
@@ -72,26 +56,35 @@
 
 #define SNAKE_MAX_LENGTH = 11;
 
+/* Restart game code */
 #define RESTART 5
 
-/** Direction struct **/
+/* Connect piezo tweeter to pins 6 and 8 of UCFK4 P1 connector
+   for push-pull operation.  */
+#define PIEZO_PIO PIO_DEFINE (PORT_D, 6)
+#define PIEZO1_PIO PIO_DEFINE (PORT_D, 4)
+#define PIEZO2_PIO PIO_DEFINE (PORT_D, 6)
+#define TEST_PIO PIO_DEFINE (PORT_D, 3)
+
+/** STRUCT -------------------------------------------------------------------------------------- **/
+
+/* Direction struct */
 enum direction {NORTH, EAST, SOUTH, WEST};
 typedef enum direction direction_t;
 
-/* This is the snake struct */
+/* Snake struct */
 struct snake
 {
     tinygl_point_t head; /* Current head of snake.  */
     direction_t head_direction; /* Current direction.  */
 
-    tinygl_point_t body[10]; // Current body of snake
-    direction_t body_direction[10];
+    tinygl_point_t body[12]; // Current body of snake
+    direction_t body_direction[12];
     uint16_t body_length; // Current length of the snake
 };
 typedef struct snake snake_t;
 
-
-/* struct of an apple */
+/* Apple struct */
 struct apple
 {
     tinygl_point_t location; // X and Y location of the apple
@@ -99,21 +92,55 @@ struct apple
 typedef struct apple apple_t;
 
 
-int control(int level);
-int level_chooser(void);
-int coord(void);
-int tiny_text_init(void) ;
-snake_t snake_init(void);
-int check_boundary_cross(snake_t snake);
+/** SIGNATURES -------------------------------------------------------------------------------------- **/
+
+
+/** A function to generate a random integer.
+ * @param upper bound, lower bound
+ * @return an integer within the bound inclusive **/
 int randomiser(int upper, int lower);
-snake_t snake_eat(snake_t snake);
+
+/** Automatically slither the snake
+ * @param the snake itself
+ * @return the snake itself **/
 snake_t snake_slither_forward(snake_t snake);
+
+/** This function will check if the snake has crossed the matrix's boundary. 
+ * @param the snake itself. 
+ * @return the RESTART code if game is over **/
+int check_boundary_cross(snake_t snake);
+
+/** Check if the snake has collided with itself 
+ * @param the snake itself. 
+ * @return the RESTART code if game is over **/
 int check_collision(snake_t snake);
-snake_t navswitch_snake(snake_t my_snake);
+
+/** Grow the snake 
+ * @param the snake itself. 
+ * @return the snake that has been grown **/
+snake_t snake_grow(snake_t my_snake);
+
+/** Grow the snake 
+ * @param the snake itself. 
+ * @return the snake that has been grown **/
+snake_t snake_init(void);
+
+/** A function to randomise a number between two bounds inclusive
+ * @param upper bound, lower bound 
+ * @return a random integer in that bound inclusive **/
+int randomiser(int upper, int lower);
+
+/** Make a new apple at a location that isn't where the snake is 
+ * @param the snake including its location
+ * @return an apple **/
 apple_t make_apple(snake_t snake);
-int level_chooser(void);
-int display_text(int text_to_display, int require_exit_by_pushing_navswitch);
 
 
+
+/** Main function to coordinate the game **/
+int control(int level);
+
+/** This function is called to restart the game, and to display the message SNAKE **/
+int coord(void);
 
 #endif

@@ -22,14 +22,9 @@ The orientation of the matrix is vertical such that the USB port is at the top o
 
 ## Complexity Description
 We've added some complexity into the program for extra marks.
-1. There is music at the start and at the end of the game, according to how you did, and when the snake turns.
+1. There is buzz as the snake moves. The buzz happens before the snake actually slithers by one pixel, and lasts a bit longer too.
 2. The turning of the snake is a complex process involving many loops.
 3. Pressing Game over lets you know how well you did - your score - printing variable to output.
 4. It is possible to restart the game from the Game Over Menu, rather than having to run `make program` again.
 5. There are different levels: 1, 2 and 3. The higher the level, the acceleration of the snake will increase after each apple is eaten.
 6. The snake dies when it collides with itself, or any of the boundary.
-
-## To Do List
-1. The snake head must not appear at the boundary.
-2. Separate the file.
-3. The music 

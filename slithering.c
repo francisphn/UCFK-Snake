@@ -8,7 +8,6 @@
 
 
 /** INCLUDE HEADER FILES  **/
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,122 +21,12 @@
 #include "display.h"
 #include "../fonts/font3x5_1.h"
 #include "font.h"
-//#include "piezo.h"
-//#include "mmelody.h"
+#include "pio.h"
+#include "button.h"
 
 #include "slithering.h"
-
-/** This section will include self-defined tinygl functions **/
-
-/** Initialise tinygl **/
-
-int tiny_text_init(void) 
-{
-    tinygl_init(LOOP_RATE);
-    tinygl_font_set(&font3x5_1);
-    tinygl_text_speed_set(MESSAGE_RATE);
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE); // horizontal
-    return 0;
-}
-
-
-/** display text, either GAME OVER or SNAKE
- * @param the text to display (0 for Snake and 1 for Game over) 
- *            and whether navswitch confirmation is needed  **/
-
-int display_text(int text_to_display, int require_exit_by_pushing_navswitch)
-{
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-    tinygl_clear();
-    tiny_text_init();
-
-    if (text_to_display == 0) {
-        tinygl_text("SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE");
-    } else if (text_to_display == 1) {
-        tinygl_text("GAME OVER GAME OVER GAME OVER GAME OVER GAME OVER");
-    } else if (text_to_display == 2) {
-        tinygl_text("WELL PLAYED WELL PLAYED WELL PLAYED WELL PLAYED WELL PLAYED");
-    }
-    navswitch_init();
-    
-    pacer_init (LOOP_RATE);
-
-    while (1)
-    {
-        pacer_wait(); /* Wait for next tick.  */
-        tinygl_update();
-        navswitch_update();
-
-        if (require_exit_by_pushing_navswitch == PUSH_NAVSWITCH_TO_EXIT) {
-            if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-                return 1;
-            } 
-        }
-
-    }
-    return 0;
-}
-
-/** TODO: DISPLAY SCORE AFTER PRESS
-int display_score(int my_score) 
-{
-
-}**/
-
-int level_chooser(void)
-{
-    int level = 1;
-
-    tinygl_clear();
-    tiny_text_init();
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
-    tinygl_text("L1");
-
-    while(1)
-    {
-        pacer_wait();
-        tinygl_update();
-        navswitch_update();
-
-        if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-            if (level == 3) {
-                level = 1;
-            } else {
-                level++;
-            }
-        
-            if (level == 1) {
-                tinygl_text("L1");
-            } else if (level == 2) {
-                tinygl_text("L2");
-            } else if (level == 3) {
-                tinygl_text("L3");
-            }
-
-        } else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-
-            if (level == 1) {
-                level = 3;
-            } else {
-                level--;
-            }
-        
-            if (level == 1) {
-                tinygl_text("L1");
-            } else if (level == 2) {
-                tinygl_text("L2");
-            } else if (level == 3) {
-                tinygl_text("L3");
-            }
-        } else if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-            tinygl_clear();
-            return level;
-        }
-    }
-    return 0;
-}
-
+#include "game.h"
+#include "messages.h"
 
 
 /** A function to generate a random integer.
@@ -150,17 +39,10 @@ int randomiser(int upper, int lower)
     return num;
 }
 
-/** A function to increment the length of the snake when it eats an apple.
- * @param the snake itself
- * @return the snake itself **/
-
 
 /** Automatically slither the snake
  * @param the snake itself
- * @return the snake itself, with the head of the snake incremented
- *          and the tail of the snake decremented to simulate slithering **/
-
-/** TODO: NAVSWITCH TO CONTROL SNAKE**/
+ * @return the snake itself **/
 
 snake_t snake_slither_forward(snake_t snake)
 {
@@ -195,7 +77,7 @@ snake_t snake_slither_forward(snake_t snake)
         }
     }
 
-    for  (int index = 1; index < 10; index++) {
+    for  (int index = 1; index < 12; index++) {
         tinygl_draw_point(snake.body[index], 0);
         if (snake.body[index].x != 8 && snake.body[index].y != 8) {
             snake.body_direction[index] = previous_snake.body_direction[index- 1];
@@ -209,12 +91,10 @@ snake_t snake_slither_forward(snake_t snake)
     return snake;
 }
 
-/** TODO: move the whole snake **/
-
 
 /** This function will check if the snake has crossed the matrix's boundary. 
- * @param the snake itself. When cross has been detected, call the display_text function
- * to display game over. **/
+ * @param the snake itself.
+ * @return the RESTART code if game is over **/
 
 int check_boundary_cross(snake_t snake)
 {
@@ -227,11 +107,14 @@ int check_boundary_cross(snake_t snake)
     return 0;
 }
 
-/** Check if the snake has collided with itself **/
+
+/** Check if the snake has collided with itself 
+ * @param the snake itself. 
+ * @return the RESTART code if game is over **/
 
 int check_collision(snake_t snake)
 {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 12; i++) {
         if (snake.head.x == snake.body[i].x && snake.head.y == snake.body[i].y) {
             int has_exited = display_text(GAME_OVER_TEXT, PUSH_NAVSWITCH_TO_EXIT);
             if (has_exited == 1) {
@@ -243,10 +126,13 @@ int check_collision(snake_t snake)
 }
 
 
+/** Grow the snake 
+ * @param the snake itself. 
+ * @return the snake that has been grown **/
 
 snake_t snake_init(void)
 {
-    /** A snake has 11 parts: 1 part is called the 'head', remaining 10 parts are the 'body' 
+    /** A snake has 11 parts: 1 part is called the 'head', remaining 12 parts are the 'body' 
      * The snake, when the game first start will have a head.
      * The snake has to eat one apple to grow by one part of the body.
      * We will have to initialise all these 11 parts but we only show the part slithering
@@ -256,14 +142,14 @@ snake_t snake_init(void)
 
     /** Initialise the head of the snake **/
     my_snake.head.x = randomiser(3, 1);
-    my_snake.head.y = randomiser(5, 1);
+    my_snake.head.y = randomiser(5, 2);
     my_snake.head_direction = NORTH;
 
     /** Loop to initialise each part **/
     /** Initialisation of the location of this part will take place by using a fake location 
      * This fake location should be 8, 8 **/
 
-    for (int index = 0; index < 10; index++) {
+    for (int index = 0; index < 12; index++) {
         my_snake.body[index].x = 8;
         my_snake.body[index].y = 8;
         my_snake.body_direction[index] = NORTH;
@@ -287,7 +173,7 @@ apple_t make_apple(snake_t snake)
         my_apple.location.x = rand() % 5;
         my_apple.location.y = rand() % 7;
 
-        for (int index = 0; index < 10; index++) { /** LOOP THROUGH THE WHOLE BODY UNTIL VALID LOCATION FOUND **/
+        for (int index = 0; index < 12; index++) { /** LOOP THROUGH THE WHOLE BODY UNTIL VALID LOCATION FOUND **/
             if (my_apple.location.x == snake.body[index].x && my_apple.location.y == snake.body[index].y) {
                 continue;
             } else {
@@ -302,6 +188,11 @@ apple_t make_apple(snake_t snake)
     
     return my_apple;
 }
+
+
+/** Grow the snake 
+ * @param the snake itself. 
+ * @return the snake that has been grown **/
 
 snake_t snake_grow(snake_t my_snake)
 {
@@ -323,7 +214,7 @@ snake_t snake_grow(snake_t my_snake)
         }
         tinygl_draw_point(my_snake.body[0], 1);
     } else if (my_snake.body_length > 1) {
-        for (int index = 1; index < 10; index++) { /** We want to be using index 0 for the body array **/
+        for (int index = 1; index < 12; index++) { /** We want to be using index 0 for the body array **/
             if (my_snake.body[index].x == 8 && my_snake.body[index].y == 8) {
                 my_snake.body_direction[index] = my_snake.body_direction[index - 1];
                 if (my_snake.body_direction[index - 1] == NORTH) {
@@ -347,66 +238,9 @@ snake_t snake_grow(snake_t my_snake)
     return my_snake;
 }
 
-int display_score(snake_t my_snake)
-{
-    tiny_text_init();
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
-    tinygl_clear(); // clear
-    switch(my_snake.body_length) {
-        case 0:
-            tinygl_text("00");
-            break;
-        case 1:
-            tinygl_text("01");
-            break;
-        case 2:  
-            tinygl_text("02");
-            break;
-        case 3:  
-            tinygl_text("03");
-            break;
-        case 4:  
-            tinygl_text("04");
-            break;
-        case 5:  
-            tinygl_text("05");
-            break;
-        case 6:  
-            tinygl_text("06");
-            break;
-        case 7:  
-            tinygl_text("07");
-            break;
-        case 8:  
-            tinygl_text("08");
-            break;
-        case 9:  
-            tinygl_text("09");
-            break;
-        case 10:  
-            tinygl_text("10");
-            break;
-    }
 
+/** Main function to coordinate the game **/
 
-    navswitch_init();
-    pacer_init (LOOP_RATE);
-
-    while (1)
-    {
-        pacer_wait(); /* Wait for next tick.  */
-        tinygl_update();
-        navswitch_update();
-
-        if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-            return 1;
-        } 
-
-    }
-    return 0;
-}
-
-/** THE CONTROL FUNCTION **/
 int control(int level)
 {
     navswitch_init();
@@ -429,12 +263,18 @@ int control(int level)
     apple_t my_apple;
     int won_user_pressed;
     int menu_score_press;
+    int navswitch_pressed_play_buzz = 0;
+
+    
+    pio_config_set (PIEZO1_PIO, PIO_OUTPUT_LOW);
+    pio_config_set (PIEZO2_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (TEST_PIO, PIO_OUTPUT_HIGH);
 
     while (1) {
         /** Is game over? Check if snake is dead - snake either collided or crossed boundary of matrix **/
         if (game_start == GAME_ALREADY_STARTED) { 
             restart_check_1 = check_boundary_cross(my_snake); /** Check if the snake head has crossed the matrix boundary **/
-            restart_check_2 = check_collision(my_snake); /** Check if the snake had has collided with any of its body's 10 parts **/
+            restart_check_2 = check_collision(my_snake); /** Check if the snake had has collided with any of its body's 12 parts **/
             if (restart_check_1 == RESTART || restart_check_2 == RESTART) {
                 menu_score_press = display_score(my_snake);
                 if (menu_score_press == 1) {
@@ -450,20 +290,32 @@ int control(int level)
         tinygl_update();
 
         /** Navswitch turn of the snake **/
-        if (navswitch_push_event_p(NAVSWITCH_EAST) == 1) {
+        if (navswitch_push_event_p(NAVSWITCH_EAST)) {
+            navswitch_pressed_play_buzz = 1;
             my_snake.head_direction = EAST;
         } else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
+            navswitch_pressed_play_buzz = 1;
             my_snake.head_direction = SOUTH;
         } else if (navswitch_push_event_p(NAVSWITCH_WEST)) {
+            navswitch_pressed_play_buzz = 1;
             my_snake.head_direction = WEST;
         } else if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+            navswitch_pressed_play_buzz = 1;
             my_snake.head_direction = NORTH;
         }
 
         tick++;
 
         
-
+        if (tick > 200 / snake_speed) {
+            if (navswitch_pressed_play_buzz != 1) {
+                pio_output_toggle (PIEZO1_PIO);
+                pio_output_toggle (PIEZO2_PIO);
+            } else {
+                navswitch_pressed_play_buzz = 0;
+            }
+            
+        }
         if (tick > 300 / snake_speed) {
             tick = 0;
             my_snake = snake_slither_forward(my_snake);
@@ -474,12 +326,16 @@ int control(int level)
                 game_start = GAME_ALREADY_STARTED;
         } else {
             if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                //tinygl_draw_point(my_apple.location, 0);
+                my_apple = make_apple(my_snake);
+                tinygl_draw_point(my_apple.location, 0);
+                tinygl_draw_point(my_apple.location, 1);
                 my_snake.body_length++;
+                my_snake = snake_grow(my_snake);
                 snake_speed += speed_increment;
                 
-                
-                if (my_snake.body_length == 10) {
+                pio_output_toggle(TEST_PIO);
+
+                if (my_snake.body_length == 12) {
                     won_user_pressed = display_text(2, PUSH_NAVSWITCH_TO_EXIT);
                     if (won_user_pressed == 1) {
                         menu_score_press = display_score(my_snake);
@@ -489,14 +345,15 @@ int control(int level)
                     }
                 }
 
-                my_snake = snake_grow(my_snake);
-                my_apple = make_apple(my_snake);
+                
             }
         }
     }
 
     return 0;
 }
+
+/** This function is called to restart the game, and to display the message SNAKE **/
 
 int coord(void)
 {
@@ -519,15 +376,5 @@ int coord(void)
     return 0;
 }
 
-int main(void) 
-{
-    navswitch_init();
-    int restart_check = 0;
-    while (true) {
-        restart_check = coord();
-        if (restart_check == RESTART) {
-            continue;
-        }
-    }
-}
+
 

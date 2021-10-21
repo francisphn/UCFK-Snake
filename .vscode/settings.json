@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.mmel": "c",
+        "time.h": "c"
+    }
+}
