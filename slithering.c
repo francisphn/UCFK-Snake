@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 #include "system.h"
 #include "tinygl.h"
@@ -27,12 +26,6 @@
 #include "slithering.h"
 #include "game.h"
 #include "messages.h"
-
-#include "pio.h"
-#include "task.h"
-#include "tweeter.h"
-#include "mmelody.h"
-#include "music.h"
 
 /** Automatically slither the snake
  * @param the snake itself
@@ -258,7 +251,6 @@ int control(int level)
     int won_user_pressed;
     int menu_score_press;
     int navswitch_pressed_play_buzz = 0;
-    //int period = 0;
     
     pio_config_set (PIEZO1_PIO, PIO_OUTPUT_LOW);
     pio_config_set (PIEZO2_PIO, PIO_OUTPUT_HIGH);
@@ -322,34 +314,15 @@ int control(int level)
                 my_apple = make_apple(my_snake);
                 game_start = GAME_ALREADY_STARTED;
         } else { // Make apple after snake has eaten the previous one
-            if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {
-                
-                /** Music to be implemented here
-                while (period < TASK_RATE / TWEETER_TASK_RATE) {
-                    int music_data = 0;
-                    int* music_data_ptr = &music_data;
-                    tweeter_task(music_data_ptr);
-                    tune_task(music_data_ptr);
-                    period++;
-                }
-
-                pio_output_toggle(PIEZO_PIO);
-                pio_output_toggle(PIEZO_PIO);
-                
-                system_init ();
-                tweeter_task_init ();
-                tune_task_init ();**/
-
-                   
+            if (my_snake.head.x == my_apple.location.x && my_snake.head.y == my_apple.location.y) {          
                 my_apple = make_apple(my_snake);
                 tinygl_draw_point(my_apple.location, 0);
                 tinygl_draw_point(my_apple.location, 1);
                 my_snake.body_length++;
                 my_snake = snake_grow(my_snake);
-                snake_speed += speed_increment;
-                
-                pio_output_toggle(TEST_PIO);
+                snake_speed += speed_increment; // Increment the speed of the snake.
 
+                // If the snake has eaten 12 apples, the player wins the game.
                 if (my_snake.body_length == 12) {
                     won_user_pressed = display_text(2, PUSH_NAVSWITCH_TO_EXIT);
                     if (won_user_pressed == 1) {
@@ -359,12 +332,9 @@ int control(int level)
                         }
                     }
                 }
-
-                
             }
         }
     }
-
     return 0;
 }
 

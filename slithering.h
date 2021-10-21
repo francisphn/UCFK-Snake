@@ -64,7 +64,6 @@
 #define PIEZO_PIO PIO_DEFINE (PORT_D, 6)
 #define PIEZO1_PIO PIO_DEFINE (PORT_D, 4)
 #define PIEZO2_PIO PIO_DEFINE (PORT_D, 6)
-#define TEST_PIO PIO_DEFINE (PORT_D, 3)
 
 /** STRUCT -------------------------------------------------------------------------------------- **/
 
