@@ -24,4 +24,12 @@
 #include "pio.h"
 #include "button.h"
 
+/** A function to generate a random integer.
+ * @param upper bound, lower bound
+ * @return an integer within the bound inclusive **/
+int randomiser(int upper, int lower);
+
+/** This function is called to restart the game, and to display the message SNAKE **/
+int coord(void);
+
 #endif

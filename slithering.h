@@ -94,12 +94,6 @@ typedef struct apple apple_t;
 
 /** SIGNATURES -------------------------------------------------------------------------------------- **/
 
-
-/** A function to generate a random integer.
- * @param upper bound, lower bound
- * @return an integer within the bound inclusive **/
-int randomiser(int upper, int lower);
-
 /** Automatically slither the snake
  * @param the snake itself
  * @return the snake itself **/
@@ -135,12 +129,7 @@ int randomiser(int upper, int lower);
  * @return an apple **/
 apple_t make_apple(snake_t snake);
 
-
-
 /** Main function to coordinate the game **/
 int control(int level);
-
-/** This function is called to restart the game, and to display the message SNAKE **/
-int coord(void);
 
 #endif

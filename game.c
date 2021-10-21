@@ -2,8 +2,7 @@
  * Program: UCFK4 Snake
  * Module: game.c
  * Authors: Francis Phan, Richard Li
- * Description: This module provides for some modules
- *              to be simulate a snake on the LED matrix.
+ * Description: The main function.
 **/
 
 
@@ -27,6 +26,44 @@
 #include "slithering.h"
 #include "game.h"
 #include "messages.h"
+
+
+/** A function to generate a random integer.
+ * @param upper bound, lower bound
+ * @return an integer within the bound inclusive **/
+
+int randomiser(int upper, int lower)
+{
+    int num = (rand() % (upper - lower + 1)) + lower;
+    return num;
+}
+
+
+/** This function is called to restart the game, and to display the message SNAKE **/
+
+int coord(void)
+{
+    system_init();
+    navswitch_init();
+    tinygl_init(LOOP_RATE);
+    tinygl_font_set (&font3x5_1);
+    pacer_init(PACER_RATE);
+
+    int outcome = display_text(SNAKE_TEXT, PUSH_NAVSWITCH_TO_EXIT);
+    int restart_check = 0;
+    if (outcome == 1) {
+        tinygl_clear();
+        int level = level_chooser();
+        restart_check = control(level);
+        if (restart_check == RESTART) {
+            return RESTART;
+        }
+    }
+    return 0;
+}
+
+
+/** Main Function **/
 
 int main(void) 
 {
